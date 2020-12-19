@@ -2,9 +2,9 @@
   "name": "discord.js-interactions-api",
   "version": "1.0.0",
   "description": "g",
-  "main": "src/index.ts",
+  "main": "src/index.js",
   "scripts": {
-    "build": "rimraf build/ && tsc"
+    "build": "rimraf lib/ && tsc"
   },
   "repository": {
     "type": "git",
