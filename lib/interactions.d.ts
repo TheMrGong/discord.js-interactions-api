@@ -1,6 +1,6 @@
 import Discord, { Snowflake } from "discord.js";
 import { APIApplicationCommand, APIApplicationCommandInteractionDataOption, APIMessage, MessageType, APIInteraction, APIInteractionResponseType, InteractionType, MessageFlags, APIInteractionApplicationCommandCallbackData, RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types";
-import { APIInteractionFollowupCallbackData, InteractionHandler, RegisteredCommand } from "./types";
+import { InteractionHandler, RegisteredCommand } from "./types";
 export declare class DiscordInteraction {
     client: Discord.Client;
     interactions: InteractionClient;
@@ -24,7 +24,7 @@ export declare class DiscordInteraction {
     private ensureResponseVisible;
     edit(content: string): Promise<this>;
     delete(): Promise<this>;
-    createFollowupRaw(data: APIInteractionFollowupCallbackData): Promise<DiscordFollowupMessage>;
+    createFollowupRaw(data: APIInteractionApplicationCommandCallbackData): Promise<DiscordFollowupMessage>;
     followupReply(content: string): Promise<DiscordFollowupMessage>;
     followupWhisper(content: string): Promise<DiscordFollowupMessage>;
     static convertInteraction(client: Discord.Client, interactions: InteractionClient, data: APIInteraction): Promise<DiscordInteraction>;
@@ -71,7 +71,7 @@ export declare class InteractionClient {
     getApplicationCommands(guildId?: Snowflake): Promise<APIApplicationCommand[]>;
     deleteCommand(guildId: Snowflake | undefined, commandId: Snowflake): Promise<any>;
     followupBase(interaction: DiscordInteraction): any;
-    createFollowupInteraction(interaction: DiscordInteraction, data: APIInteractionFollowupCallbackData): Promise<DiscordFollowupMessage>;
+    createFollowupInteraction(interaction: DiscordInteraction, data: APIInteractionApplicationCommandCallbackData): Promise<DiscordFollowupMessage>;
     editInteractionResponse(interaction: DiscordInteraction, content: string, messageId?: string): Promise<any>;
     deleteInteractionResponse(interaction: DiscordInteraction, messageId?: string): Promise<any>;
 }

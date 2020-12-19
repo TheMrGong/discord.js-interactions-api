@@ -12,7 +12,7 @@ import {
     APIInteractionApplicationCommandCallbackData,
     RESTPostAPIApplicationCommandsJSONBody,
 } from "discord-api-types"
-import { APIInteractionFollowupCallbackData, InteractionHandler, RegisteredCommand } from "./types"
+import { InteractionHandler, RegisteredCommand } from "./types"
 
 const noop = () => {}
 //@ts-ignore
@@ -127,7 +127,7 @@ export class DiscordInteraction {
         return this
     }
 
-    async createFollowupRaw(data: APIInteractionFollowupCallbackData) {
+    async createFollowupRaw(data: APIInteractionApplicationCommandCallbackData) {
         return this.interactions.createFollowupInteraction(this, data)
     }
 
@@ -400,7 +400,10 @@ export class InteractionClient {
         return api(this.client).webhooks(this.client.user?.id)[interaction.token]
     }
 
-    async createFollowupInteraction(interaction: DiscordInteraction, data: APIInteractionFollowupCallbackData) {
+    async createFollowupInteraction(
+        interaction: DiscordInteraction,
+        data: APIInteractionApplicationCommandCallbackData
+    ) {
         const response = (await this.followupBase(interaction).post({ data })) as APIMessage
 
         return DiscordFollowupMessage.construct(this.client, interaction, response)
