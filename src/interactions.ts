@@ -105,7 +105,7 @@ export class DiscordInteraction {
             throw new Error(`This interaction has yet to be acknowledged`)
         }
         if (!this.editableInitialResponse) {
-            throw new Error(`Cannot modify inital response, it was either ephemeral or there was no sent message`)
+            throw new Error(`Cannot modify initial response, it was either ephemeral or there was no sent message`)
         }
         if (this.deleted) {
             throw new Error(`Initial response was deleted, cannot be modified`)
