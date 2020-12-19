@@ -10,13 +10,9 @@ import {
     InteractionType,
     MessageFlags,
     APIInteractionApplicationCommandCallbackData,
+    RESTPostAPIApplicationCommandsJSONBody,
 } from "discord-api-types"
-import {
-    APICreateCommandData,
-    APIInteractionFollowupCallbackData,
-    InteractionHandler,
-    RegisteredCommand,
-} from "./types"
+import { APIInteractionFollowupCallbackData, InteractionHandler, RegisteredCommand } from "./types"
 
 const noop = () => {}
 //@ts-ignore
@@ -302,7 +298,7 @@ class CommandManager {
 
     private async _createCommand(
         guildId: Snowflake | undefined,
-        data: APICreateCommandData,
+        data: RESTPostAPIApplicationCommandsJSONBody,
         handler: InteractionHandler
     ) {
         const command = await this.interactions.createApplicationCommand(guildId, data)
@@ -313,11 +309,15 @@ class CommandManager {
         }
     }
 
-    async createGuildCommand(guildId: Snowflake, data: APICreateCommandData, handler: InteractionHandler) {
+    async createGuildCommand(
+        guildId: Snowflake,
+        data: RESTPostAPIApplicationCommandsJSONBody,
+        handler: InteractionHandler
+    ) {
         return this._createCommand(guildId, data, handler)
     }
 
-    async createGlobalCommand(data: APICreateCommandData, handler: InteractionHandler) {
+    async createGlobalCommand(data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler) {
         return this._createCommand(undefined, data, handler)
     }
 
@@ -354,7 +354,7 @@ export class InteractionClient {
         return base.commands(input)
     }
 
-    async createApplicationCommand(guildId: Snowflake | undefined, data: APICreateCommandData) {
+    async createApplicationCommand(guildId: Snowflake | undefined, data: RESTPostAPIApplicationCommandsJSONBody) {
         return (await this.commandsBase(guildId).post({ data })) as APIApplicationCommand
     }
 

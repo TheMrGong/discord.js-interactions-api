@@ -2,8 +2,8 @@ import {
     APIApplicationCommandOption,
     APIApplicationCommandOptionChoice,
     ApplicationCommandOptionType,
+    RESTPostAPIApplicationCommandsJSONBody,
 } from "discord-api-types/v8"
-import { APICreateCommandData } from "./types"
 
 export function user(name: string, description: string): APIApplicationCommandOption {
     return {
@@ -124,7 +124,7 @@ export function command(
     name: string,
     description: string,
     options?: APIApplicationCommandOption[]
-): APICreateCommandData {
+): RESTPostAPIApplicationCommandsJSONBody {
     return {
         name,
         description,

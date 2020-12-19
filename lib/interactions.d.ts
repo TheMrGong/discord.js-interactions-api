@@ -1,6 +1,6 @@
 import Discord, { Snowflake } from "discord.js";
-import { APIApplicationCommand, APIApplicationCommandInteractionDataOption, APIMessage, MessageType, APIInteraction, APIInteractionResponseType, InteractionType, MessageFlags, APIInteractionApplicationCommandCallbackData } from "discord-api-types";
-import { APICreateCommandData, APIInteractionFollowupCallbackData, InteractionHandler, RegisteredCommand } from "./types";
+import { APIApplicationCommand, APIApplicationCommandInteractionDataOption, APIMessage, MessageType, APIInteraction, APIInteractionResponseType, InteractionType, MessageFlags, APIInteractionApplicationCommandCallbackData, RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types";
+import { APIInteractionFollowupCallbackData, InteractionHandler, RegisteredCommand } from "./types";
 export declare class DiscordInteraction {
     client: Discord.Client;
     interactions: InteractionClient;
@@ -55,8 +55,8 @@ declare class CommandManager {
     };
     constructor(interactions: InteractionClient);
     private _createCommand;
-    createGuildCommand(guildId: Snowflake, data: APICreateCommandData, handler: InteractionHandler): Promise<void>;
-    createGlobalCommand(data: APICreateCommandData, handler: InteractionHandler): Promise<void>;
+    createGuildCommand(guildId: Snowflake, data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler): Promise<void>;
+    createGlobalCommand(data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler): Promise<void>;
     cleanupUnreferencedGlobalCommands(): Promise<void>;
 }
 export declare class InteractionClient {
@@ -64,7 +64,7 @@ export declare class InteractionClient {
     commands: CommandManager;
     constructor(client: Discord.Client);
     commandsBase(guildId: Snowflake | undefined, input?: any): any;
-    createApplicationCommand(guildId: Snowflake | undefined, data: APICreateCommandData): Promise<APIApplicationCommand>;
+    createApplicationCommand(guildId: Snowflake | undefined, data: RESTPostAPIApplicationCommandsJSONBody): Promise<APIApplicationCommand>;
     ackRawInteraction(id: string, token: string, type: APIInteractionResponseType, callbackData?: APIInteractionApplicationCommandCallbackData): Promise<any>;
     ackInteraction(interaction: DiscordInteraction, replyType: APIInteractionResponseType, callbackData?: APIInteractionApplicationCommandCallbackData): Promise<any>;
     replyInteraction(interaction: DiscordInteraction, replyType: APIInteractionResponseType, message: string): Promise<any>;

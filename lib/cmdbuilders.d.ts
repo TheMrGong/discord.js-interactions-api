@@ -1,5 +1,4 @@
-import { APIApplicationCommandOption, APIApplicationCommandOptionChoice } from "discord-api-types/v8";
-import { APICreateCommandData } from "./types";
+import { APIApplicationCommandOption, APIApplicationCommandOptionChoice, RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types/v8";
 export declare function user(name: string, description: string): APIApplicationCommandOption;
 export declare function requiredUser(name: string, description: string): APIApplicationCommandOption;
 export declare function choice(name: string, value?: string): APIApplicationCommandOptionChoice;
@@ -11,4 +10,4 @@ export declare function channel(name: string, description: string): APIApplicati
 export declare function requiredChannel(name: string, description: string): APIApplicationCommandOption;
 export declare function subCommand(name: string, description: string, options: APIApplicationCommandOption[]): APIApplicationCommandOption;
 export declare function group(name: string, description: string, options: APIApplicationCommandOption[]): APIApplicationCommandOption;
-export declare function command(name: string, description: string, options?: APIApplicationCommandOption[]): APICreateCommandData;
+export declare function command(name: string, description: string, options?: APIApplicationCommandOption[]): RESTPostAPIApplicationCommandsJSONBody;
