@@ -428,7 +428,7 @@ function buildOptionCloner(interaction: DiscordInteraction, path: string) {
             if (clonedPath) {
                 clonedPath += "."
             }
-            clonedPath += name
+            clonedPath += name.toLowerCase()
             return buildOptionsPath(interaction, clonedPath)
         },
         apply(): any {
@@ -449,7 +449,7 @@ function buildOptionsPath(interaction: DiscordInteraction, path = "") {
             if (newPath) {
                 newPath += "."
             }
-            newPath += name
+            newPath += name.toLowerCase()
 
             const option = findOption(interaction._options, newPath)
             if (option && (!option.options || option.options.length === 0)) {
