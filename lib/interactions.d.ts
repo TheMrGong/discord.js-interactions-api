@@ -55,8 +55,10 @@ declare class CommandManager {
     };
     constructor(interactions: InteractionClient);
     private _createCommand;
-    createGuildCommand(guildId: Snowflake, data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler): Promise<void>;
-    createGlobalCommand(data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler): Promise<void>;
+    registerCommand(command: APIApplicationCommand, handler: InteractionHandler): void;
+    unregister(id: Snowflake): RegisteredCommand;
+    createGuildCommand(guildId: Snowflake, data: RESTPostAPIApplicationCommandsJSONBody, handler?: InteractionHandler): Promise<APIApplicationCommand>;
+    createGlobalCommand?(data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler): Promise<APIApplicationCommand>;
     cleanupUnreferencedGlobalCommands(): Promise<void>;
 }
 export declare class InteractionClient {

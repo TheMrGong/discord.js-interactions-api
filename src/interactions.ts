@@ -13,6 +13,7 @@ import {
     RESTPostAPIApplicationCommandsJSONBody,
 } from "discord-api-types"
 import { InteractionHandler, RegisteredCommand } from "./types"
+import { command } from "./cmdbuilders"
 
 const noop = () => {}
 //@ts-ignore
@@ -299,25 +300,42 @@ class CommandManager {
     private async _createCommand(
         guildId: Snowflake | undefined,
         data: RESTPostAPIApplicationCommandsJSONBody,
-        handler: InteractionHandler
+        handler?: InteractionHandler
     ) {
         const command = await this.interactions.createApplicationCommand(guildId, data)
 
+        if (handler) {
+            this.registered[command.id] = {
+                command,
+                handler,
+            }
+        }
+
+        return command
+    }
+
+    registerCommand(command: APIApplicationCommand, handler: InteractionHandler) {
         this.registered[command.id] = {
             command,
             handler,
         }
     }
 
+    unregister(id: Snowflake) {
+        const removed = this.registered[id]
+        delete this.registered[id]
+        return removed
+    }
+
     async createGuildCommand(
         guildId: Snowflake,
         data: RESTPostAPIApplicationCommandsJSONBody,
-        handler: InteractionHandler
+        handler?: InteractionHandler
     ) {
         return this._createCommand(guildId, data, handler)
     }
 
-    async createGlobalCommand(data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler) {
+    async createGlobalCommand?(data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler) {
         return this._createCommand(undefined, data, handler)
     }
 
