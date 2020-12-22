@@ -11,6 +11,7 @@ export declare class DiscordInteraction {
     token: string;
     commandId: Snowflake;
     commandName?: string;
+    optionPath: string;
     _options?: APIApplicationCommandInteractionDataOption[];
     private acknowledged;
     private editableInitialResponse;
