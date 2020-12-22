@@ -1,6 +1,5 @@
 import Discord, { Snowflake } from "discord.js";
 import { APIApplicationCommand, APIApplicationCommandInteractionDataOption, APIMessage, MessageType, APIInteraction, APIInteractionResponseType, InteractionType, MessageFlags, APIInteractionApplicationCommandCallbackData, RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types";
-import { InteractionHandler, RegisteredCommand } from "./types";
 export declare class DiscordInteraction {
     client: Discord.Client;
     interactions: InteractionClient;
@@ -11,6 +10,7 @@ export declare class DiscordInteraction {
     member: Discord.GuildMember;
     token: string;
     commandId: Snowflake;
+    commandName?: string;
     _options?: APIApplicationCommandInteractionDataOption[];
     private acknowledged;
     private editableInitialResponse;
@@ -48,22 +48,8 @@ declare class DiscordFollowupMessage {
     delete(): Promise<this>;
     static construct(client: Discord.Client, interaction: DiscordInteraction, data: APIMessage): DiscordFollowupMessage;
 }
-declare class CommandManager {
-    interactions: InteractionClient;
-    registered: {
-        [id: string]: RegisteredCommand;
-    };
-    constructor(interactions: InteractionClient);
-    private _createCommand;
-    registerCommand(command: APIApplicationCommand, handler: InteractionHandler): void;
-    unregister(id: Snowflake): RegisteredCommand;
-    createGuildCommand(guildId: Snowflake, data: RESTPostAPIApplicationCommandsJSONBody, handler?: InteractionHandler): Promise<APIApplicationCommand>;
-    createGlobalCommand?(data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler): Promise<APIApplicationCommand>;
-    cleanupUnreferencedGlobalCommands(): Promise<void>;
-}
 export declare class InteractionClient {
     client: Discord.Client;
-    commands: CommandManager;
     constructor(client: Discord.Client);
     commandsBase(guildId: Snowflake | undefined, input?: any): any;
     createApplicationCommand(guildId: Snowflake | undefined, data: RESTPostAPIApplicationCommandsJSONBody): Promise<APIApplicationCommand>;
