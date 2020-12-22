@@ -25,7 +25,7 @@
     "@types/node": "^14.14.14",
     "@types/ws": "^7.4.0",
     "chalk": "^4.1.0",
-    "discord-api-types": "https://github.com/discordjs/discord-api-types#main",
+    "discord-api-types": "^0.11.2",
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "moment": "^2.29.1",

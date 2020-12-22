@@ -2,7 +2,7 @@ dependencies:
   '@types/node': 14.14.14
   '@types/ws': 7.4.0
   chalk: 4.1.0
-  discord-api-types: github.com/discordjs/discord-api-types/91cf0d31d77318a7ce0f75fc57dd683418fcc225
+  discord-api-types: 0.11.2
   discord.js: 12.5.1
   dotenv: 8.2.0
   moment: 2.29.1
@@ -124,6 +124,12 @@ packages:
       node: '>=0.3.1'
     resolution:
       integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==
+  /discord-api-types/0.11.2:
+    dev: false
+    engines:
+      node: '>=12'
+    resolution:
+      integrity: sha512-CU9kKhAg+xZ/e+0v3CH70tmwPFx0vzidGZbJbIegnutr9NucrW8Mg45n40nvJf261LtZWLbJLWVopfwx+T6Rpg==
   /discord.js/12.5.1:
     dependencies:
       '@discordjs/collection': 0.1.6
@@ -331,19 +337,11 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
-  github.com/discordjs/discord-api-types/91cf0d31d77318a7ce0f75fc57dd683418fcc225:
-    dev: false
-    engines:
-      node: '>=12'
-    name: discord-api-types
-    resolution:
-      tarball: 'https://codeload.github.com/discordjs/discord-api-types/tar.gz/91cf0d31d77318a7ce0f75fc57dd683418fcc225'
-    version: 0.10.0
 specifiers:
   '@types/node': ^14.14.14
   '@types/ws': ^7.4.0
   chalk: ^4.1.0
-  discord-api-types: 'https://github.com/discordjs/discord-api-types#main'
+  discord-api-types: ^0.11.2
   discord.js: ^12.5.1
   dotenv: ^8.2.0
   moment: ^2.29.1
