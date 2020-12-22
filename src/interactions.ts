@@ -381,11 +381,8 @@ function buildOptionsPath(interaction: DiscordInteraction, path = "") {
 
 function buildOptionNamePath(interaction: DiscordInteraction, inputOptions: any, path = ""): string {
     if (inputOptions) {
-        for (const { options, name } of inputOptions) {
-            if (!options) {
-                break
-            }
-            if (name) {
+        for (const { options, name, value } of inputOptions) {
+            if (name && !value) {
                 path += name + "."
             }
             return buildOptionNamePath(interaction, options, path)
