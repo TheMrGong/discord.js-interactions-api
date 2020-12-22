@@ -51,8 +51,8 @@ export class DiscordInteraction {
         this.type = data.type
         this.token = data.token
 
-        this._options = data.data?.options
-        this.commandId = data.data?.id || ""
+        this._options = data.data ? data.data.options : undefined
+        this.commandId = data.data ? data.data.id : ""
         this.guild = guild
         this.channel = channel
         this.member = member
@@ -268,7 +268,11 @@ class CommandManager {
             } else {
                 const handler = (type: string) => {
                     console.warn(
-                        `User ${rawInteraction.member.user.username}#${rawInteraction.member.user.discriminator}(${rawInteraction.member.user.id}) attempted to use ${type} unregistered command '${rawInteraction.data?.name}'`
+                        `User ${rawInteraction.member.user.username}#${rawInteraction.member.user.discriminator}(${
+                            rawInteraction.member.user.id
+                        }) attempted to use ${type} unregistered command '${
+                            rawInteraction.data ? rawInteraction.data.name : undefined
+                        }'`
                     )
                     this.interactions.ackRawInteraction(
                         rawInteraction.id,
@@ -285,11 +289,13 @@ class CommandManager {
                     .then(() => handler(`guild(${rawInteraction.guild_id})`))
                     .catch((e) => {
                         this.interactions
-                            .deleteCommand(undefined, rawInteraction.data?.id || "")
+                            .deleteCommand(undefined, rawInteraction.data ? rawInteraction.data.id : "")
                             .then(() => handler(`global`))
                             .catch((e) => {
                                 console.warn(
-                                    `Failed to remove unregistered command ${rawInteraction.data?.name}, wasn't either a global or guild command`
+                                    `Failed to remove unregistered command ${
+                                        rawInteraction.data ? rawInteraction.data.name : undefined
+                                    }, wasn't either a global or guild command`
                                 )
                             })
                     })
@@ -365,7 +371,7 @@ export class InteractionClient {
     }
 
     commandsBase(guildId: Snowflake | undefined, input?: any) {
-        const base = api(this.client).applications(this.client.user?.id)
+        const base = api(this.client).applications(this.client.user ? this.client.user.id : undefined)
         if (guildId) {
             base.guilds(guildId)
         }
@@ -415,7 +421,7 @@ export class InteractionClient {
     // followups
 
     followupBase(interaction: DiscordInteraction) {
-        return api(this.client).webhooks(this.client.user?.id)[interaction.token]
+        return api(this.client).webhooks(this.client.user ? this.client.user.id : undefined)[interaction.token]
     }
 
     async createFollowupInteraction(
@@ -495,7 +501,8 @@ function validatePath(interaction: DiscordInteraction, fullPath: string) {
 
 function readInteractionValue(interaction: DiscordInteraction, fullPath: string) {
     validatePath(interaction, fullPath)
-    return findOption(interaction._options, fullPath)?.value
+    const option = findOption(interaction._options, fullPath)
+    return option ? option.value : undefined
 }
 
 function findOption(options: APIApplicationCommandInteractionDataOption[] | undefined, fullPath: string) {
