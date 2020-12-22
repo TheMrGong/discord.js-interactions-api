@@ -32,7 +32,7 @@ export class DiscordInteraction {
     optionPath: string
     _options?: APIApplicationCommandInteractionDataOption[]
 
-    private acknowledged = false
+    private _acknowledged = false
     private editableInitialResponse = false
     deleted = false
 
@@ -60,15 +60,19 @@ export class DiscordInteraction {
         this.member = member
     }
 
+    get acknowledged() {
+        return this._acknowledged
+    }
+
     get options(): any {
         return buildOptionsPath(this)
     }
 
     async acknowledge(source: boolean) {
-        if (this.acknowledged) {
+        if (this._acknowledged) {
             throw new Error("This interaction is already acknowledged")
         }
-        this.acknowledged = true
+        this._acknowledged = true
         return this.interactions.ackInteraction(
             this,
             source ? APIInteractionResponseType.AcknowledgeWithSource : APIInteractionResponseType.Acknowledge
@@ -76,10 +80,10 @@ export class DiscordInteraction {
     }
 
     async replyChannel(source: boolean, data: APIInteractionApplicationCommandCallbackData) {
-        if (this.acknowledged) {
+        if (this._acknowledged) {
             throw new Error("This interaction is already acknowledged")
         }
-        this.acknowledged = true
+        this._acknowledged = true
         if (!data.flags || (data.flags & MessageFlags.EPHEMERAL) === 0) {
             this.editableInitialResponse = true
         }
@@ -104,7 +108,7 @@ export class DiscordInteraction {
     }
 
     private ensureResponseVisible() {
-        if (!this.acknowledged) {
+        if (!this._acknowledged) {
             throw new Error(`This interaction has yet to be acknowledged`)
         }
         if (!this.editableInitialResponse) {

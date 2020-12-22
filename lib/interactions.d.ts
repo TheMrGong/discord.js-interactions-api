@@ -13,10 +13,11 @@ export declare class DiscordInteraction {
     commandName?: string;
     optionPath: string;
     _options?: APIApplicationCommandInteractionDataOption[];
-    private acknowledged;
+    private _acknowledged;
     private editableInitialResponse;
     deleted: boolean;
     constructor(client: Discord.Client, interactions: InteractionClient, data: APIInteraction, guild: Discord.Guild, member: Discord.GuildMember, channel: Discord.TextChannel);
+    get acknowledged(): boolean;
     get options(): any;
     acknowledge(source: boolean): Promise<any>;
     replyChannel(source: boolean, data: APIInteractionApplicationCommandCallbackData): Promise<any>;
