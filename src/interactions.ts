@@ -369,12 +369,6 @@ function buildOptionsPath(interaction: DiscordInteraction, path = "") {
             }
             newPath += name.toLowerCase()
 
-            const finalPath = getFinalPath(newPath)
-
-            const option = findOption(interaction._options, finalPath)
-            if (option && (!option.options || option.options.length === 0)) {
-                return readInteractionValue(interaction, finalPath)
-            }
             return buildOptionsPath(interaction, newPath)
         },
         apply() {
