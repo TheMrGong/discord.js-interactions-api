@@ -29,6 +29,7 @@ export class DiscordInteraction {
 
     commandId: Snowflake
     commandName?: string
+    optionPath: string
     _options?: APIApplicationCommandInteractionDataOption[]
 
     private acknowledged = false
@@ -52,6 +53,8 @@ export class DiscordInteraction {
         this._options = data.data ? data.data.options : undefined
         this.commandId = data.data ? data.data.id : ""
         this.commandName = data.data ? data.data.name : undefined
+        this.optionPath = buildOptionNamePath(this, this._options)
+
         this.guild = guild
         this.channel = channel
         this.member = member
@@ -368,6 +371,25 @@ function buildOptionsPath(interaction: DiscordInteraction, path = "") {
     }
 
     return new Proxy(noop, handler)
+}
+
+function buildOptionNamePath(interaction: DiscordInteraction, inputOptions: any, path = ""): string {
+    if (inputOptions) {
+        for (const { options, name } of inputOptions) {
+            if (!options) {
+                break
+            }
+            if (name) {
+                path += name + "."
+            }
+            return buildOptionNamePath(interaction, options, path)
+        }
+    }
+
+    if (path.length > 0) {
+        return path.substring(0, path.length - 1)
+    }
+    return ""
 }
 
 function readInteractionValue(interaction: DiscordInteraction, fullPath: string) {
