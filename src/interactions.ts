@@ -348,6 +348,12 @@ function buildOptionCloner(interaction: DiscordInteraction, path: string) {
 }
 
 function buildOptionsPath(interaction: DiscordInteraction, path = "") {
+    function getFinalPath(path: string) {
+        if (interaction.optionPath && !path.startsWith(interaction.optionPath)) {
+            path = interaction.optionPath + "." + path
+        }
+        return path
+    }
     const handler = {
         get(_: any, name: string): any {
             if (name === "clone") {
@@ -359,14 +365,16 @@ function buildOptionsPath(interaction: DiscordInteraction, path = "") {
             }
             newPath += name.toLowerCase()
 
-            const option = findOption(interaction._options, newPath)
+            const finalPath = getFinalPath(newPath)
+
+            const option = findOption(interaction._options, finalPath)
             if (option && (!option.options || option.options.length === 0)) {
-                return readInteractionValue(interaction, newPath)
+                return readInteractionValue(interaction, finalPath)
             }
             return buildOptionsPath(interaction, newPath)
         },
         apply() {
-            return readInteractionValue(interaction, path)
+            return readInteractionValue(interaction, getFinalPath(path))
         },
     }
 
