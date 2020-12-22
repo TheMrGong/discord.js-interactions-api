@@ -12,9 +12,6 @@ import {
     APIInteractionApplicationCommandCallbackData,
     RESTPostAPIApplicationCommandsJSONBody,
 } from "discord-api-types"
-import { InteractionHandler, RegisteredCommand } from "./types"
-import { command } from "./cmdbuilders"
-
 const noop = () => {}
 //@ts-ignore
 const api: (client) => any = (client) => client.api
@@ -31,6 +28,7 @@ export class DiscordInteraction {
     token: string
 
     commandId: Snowflake
+    commandName?: string
     _options?: APIApplicationCommandInteractionDataOption[]
 
     private acknowledged = false
@@ -53,6 +51,7 @@ export class DiscordInteraction {
 
         this._options = data.data ? data.data.options : undefined
         this.commandId = data.data ? data.data.id : ""
+        this.commandName = data.data ? data.data.name : undefined
         this.guild = guild
         this.channel = channel
         this.member = member
@@ -232,142 +231,24 @@ class DiscordFollowupMessage {
         return new DiscordFollowupMessage(client, interaction, data, channel, author)
     }
 }
-
-class CommandManager {
-    interactions: InteractionClient
-    registered: {
-        [id: string]: RegisteredCommand
-    } = {}
-
-    constructor(interactions: InteractionClient) {
-        this.interactions = interactions
-        this.interactions.client.on("raw", (event) => {
-            if (event.t !== GatewayDispatchEvents.InteractionCreate) {
-                return
-            }
-            const rawInteraction = event.d as APIInteraction
-            if (rawInteraction.type !== InteractionType.ApplicationCommand || !rawInteraction.data) {
-                return
-            }
-
-            const cmdData = this.registered[rawInteraction.data.id]
-            if (cmdData) {
-                try {
-                    DiscordInteraction.convertInteraction(interactions.client, this.interactions, rawInteraction)
-                        .then(cmdData.handler)
-                        .catch((e) => {
-                            console.error(`Failed to handle interaction`)
-                            console.error(e)
-                        })
-                } catch (e) {
-                    console.error(
-                        `Uncaught error occurred while handling interaction for command ${cmdData.command.name}`
-                    )
-                    console.error(e)
-                }
-            } else {
-                const handler = (type: string) => {
-                    console.warn(
-                        `User ${rawInteraction.member.user.username}#${rawInteraction.member.user.discriminator}(${
-                            rawInteraction.member.user.id
-                        }) attempted to use ${type} unregistered command '${
-                            rawInteraction.data ? rawInteraction.data.name : undefined
-                        }'`
-                    )
-                    this.interactions.ackRawInteraction(
-                        rawInteraction.id,
-                        rawInteraction.token,
-                        APIInteractionResponseType.ChannelMessage,
-                        {
-                            content: `The command you tried to use no longer exists`,
-                            flags: MessageFlags.EPHEMERAL,
-                        }
-                    )
-                }
-                this.interactions
-                    .deleteCommand(rawInteraction.guild_id, rawInteraction.data.id)
-                    .then(() => handler(`guild(${rawInteraction.guild_id})`))
-                    .catch((e) => {
-                        this.interactions
-                            .deleteCommand(undefined, rawInteraction.data ? rawInteraction.data.id : "")
-                            .then(() => handler(`global`))
-                            .catch((e) => {
-                                console.warn(
-                                    `Failed to remove unregistered command ${
-                                        rawInteraction.data ? rawInteraction.data.name : undefined
-                                    }, wasn't either a global or guild command`
-                                )
-                            })
-                    })
-            }
-        })
-    }
-
-    private async _createCommand(
-        guildId: Snowflake | undefined,
-        data: RESTPostAPIApplicationCommandsJSONBody,
-        handler?: InteractionHandler
-    ) {
-        const command = await this.interactions.createApplicationCommand(guildId, data)
-
-        if (handler) {
-            this.registered[command.id] = {
-                command,
-                handler,
-            }
-        }
-
-        return command
-    }
-
-    registerCommand(command: APIApplicationCommand, handler: InteractionHandler) {
-        this.registered[command.id] = {
-            command,
-            handler,
-        }
-    }
-
-    unregister(id: Snowflake) {
-        const removed = this.registered[id]
-        delete this.registered[id]
-        return removed
-    }
-
-    async createGuildCommand(
-        guildId: Snowflake,
-        data: RESTPostAPIApplicationCommandsJSONBody,
-        handler?: InteractionHandler
-    ) {
-        return this._createCommand(guildId, data, handler)
-    }
-
-    async createGlobalCommand?(data: RESTPostAPIApplicationCommandsJSONBody, handler: InteractionHandler) {
-        return this._createCommand(undefined, data, handler)
-    }
-
-    async cleanupUnreferencedGlobalCommands() {
-        for (const command of await this.interactions.getApplicationCommands()) {
-            if (!this.registered[command.id]) {
-                console.info(`Deleting global command '${command.name}' that was no longer registered`)
-                console.log(
-                    JSON.stringify(
-                        await this.interactions.deleteCommand(undefined, command.id).catch((error) => {
-                            return { e: error }
-                        })
-                    )
-                )
-            }
-        }
-    }
-}
-
 export class InteractionClient {
     client: Discord.Client
-    commands: CommandManager
 
     constructor(client: Discord.Client) {
         this.client = client
-        this.commands = new CommandManager(this)
+
+        this.client.on("raw", (event) => {
+            if (event.t !== GatewayDispatchEvents.InteractionCreate) {
+                return
+            }
+            const data = event.d as APIInteraction
+            if (data.type !== InteractionType.ApplicationCommand || !data.data) {
+                return
+            }
+            DiscordInteraction.convertInteraction(this.client, this, data)
+                .then((interaction) => this.client.emit("interactionCreate", interaction))
+                .catch((e) => this.client.emit("error", e))
+        })
     }
 
     commandsBase(guildId: Snowflake | undefined, input?: any) {
@@ -489,18 +370,7 @@ function buildOptionsPath(interaction: DiscordInteraction, path = "") {
     return new Proxy(noop, handler)
 }
 
-function validatePath(interaction: DiscordInteraction, fullPath: string) {
-    const cmdData = interaction.interactions.commands.registered[interaction.commandId]
-    if (!cmdData) {
-        throw new Error("Couldn't find interaction command")
-    }
-    if (!findOption(cmdData.command.options, fullPath)) {
-        throw new Error(`Unable to find option at path ${fullPath}`)
-    }
-}
-
 function readInteractionValue(interaction: DiscordInteraction, fullPath: string) {
-    validatePath(interaction, fullPath)
     const option = findOption(interaction._options, fullPath)
     return option ? option.value : undefined
 }
